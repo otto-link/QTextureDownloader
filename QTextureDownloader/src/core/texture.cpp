@@ -99,6 +99,8 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
   return ret;
 }
 
+std::string Texture::get_id() const { return this->id; }
+
 std::string Texture::get_name() const { return this->name; }
 
 std::string Texture::get_source() const { return this->source; }
@@ -130,6 +132,44 @@ std::vector<TextureRes> Texture::get_texture_resolutions(const TextureType &text
   }
 
   return out;
+}
+
+std::string Texture::get_texture_url(const TextureType &texture_type,
+                                     const TextureRes  &texture_res)
+{
+  std::map<std::string, std::string> map;
+  std::string                        res_key;
+
+  switch (texture_type)
+  {
+  case TextureType::DIFFUSE:
+    map = this->diffuse_urls;
+    break;
+  case TextureType::NORMAL:
+    map = this->normal_urls;
+    break;
+  case TextureType::DISPLACEMENT:
+    map = this->displacement_urls;
+    break;
+  }
+
+  switch (texture_res)
+  {
+  case TextureRes::R1K:
+    res_key = "1k";
+    break;
+  case TextureRes::R2K:
+    res_key = "2k";
+    break;
+  case TextureRes::R4K:
+    res_key = "4k";
+    break;
+  case TextureRes::R8K:
+    res_key = "8k";
+    break;
+  }
+
+  return map.at(res_key);
 }
 
 bool Texture::has_texture(const TextureType &texture_type)

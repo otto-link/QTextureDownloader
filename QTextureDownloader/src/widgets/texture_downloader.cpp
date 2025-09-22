@@ -27,6 +27,10 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
 
   this->texture_manager.load();
   this->update_table_rows();
+
+  this->texture_manager.get_texture_rgba_16bit("PolyHaven_aerial_asphalt_01",
+                                               TextureType::NORMAL,
+                                               TextureRes::R1K);
 }
 
 void TextureDownloader::set_texture_res(const TextureRes &new_res)

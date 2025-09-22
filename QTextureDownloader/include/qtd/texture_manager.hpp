@@ -14,6 +14,10 @@ public:
 
   std::map<std::string, Texture> &get_textures();
 
+  std::vector<uint16_t> get_texture_rgba_16bit(const std::string &id,
+                                               const TextureType &texture_type,
+                                               const TextureRes  &texture_res);
+
   void load();
   void save() const;
 
@@ -29,7 +33,6 @@ private:
   // --- Members
   std::string                    storage_path;
   std::map<std::string, Texture> textures;
-  TextureRes                     res = TextureRes::R1K;
 };
 
 } // namespace qtd

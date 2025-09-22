@@ -58,9 +58,12 @@ public:
   void           json_from(nlohmann::json const &json);
   nlohmann::json json_to() const;
 
+  std::string             get_id() const;
   std::string             get_name() const;
   std::string             get_source() const;
   std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type);
+  std::string             get_texture_url(const TextureType &texture_type,
+                                          const TextureRes  &texture_res);
   const QImage           &get_thumbnail() const;
   bool                    has_texture(const TextureType &texture_type);
   bool has_texture(const TextureType &texture_type, const TextureRes &texture_res);

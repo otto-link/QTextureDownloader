@@ -77,6 +77,37 @@ void json_to_file(const nlohmann::json &json,
   }
 }
 
+std::vector<uint16_t> load_png_as_16bit_rgba(const std::string &path,
+                                             int               &width,
+                                             int               &height)
+{
+  QImage img(path.c_str());
+  if (img.isNull())
+  {
+    return {};
+  }
+
+  // Convert image to 16-bit RGBA format (Qt ≥ 5.13)
+  if (img.format() != QImage::Format_RGBA64)
+    img = img.convertToFormat(QImage::Format_RGBA64);
+
+  width = img.width();
+  height = img.height();
+  const int channel_count = 4; // R, G, B, A
+
+  std::vector<uint16_t> data(static_cast<size_t>(width) * height * channel_count);
+
+  for (int y = 0; y < height; ++y)
+  {
+    const uint16_t *scanline = reinterpret_cast<const uint16_t *>(img.constScanLine(y));
+    std::memcpy(&data[y * width * channel_count],
+                scanline,
+                static_cast<size_t>(width) * channel_count * sizeof(uint16_t));
+  }
+
+  return data; // RVO handles return efficiently, no need for std::move
+}
+
 std::string qimage_to_base64(const QImage &img)
 {
   if (img.isNull())

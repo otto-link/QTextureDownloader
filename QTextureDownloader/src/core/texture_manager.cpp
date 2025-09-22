@@ -1,8 +1,11 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
+#include <QApplication>
+
 #include <filesystem>
 
 #include "qtd/config.hpp"
+#include "qtd/image_fetcher.hpp"
 #include "qtd/json_fetcher.hpp"
 #include "qtd/logger.hpp"
 #include "qtd/texture_manager.hpp"
@@ -38,6 +41,41 @@ void TextureManager::file_to(const std::string &fname) const
 }
 
 std::map<std::string, Texture> &TextureManager::get_textures() { return this->textures; }
+
+std::vector<uint16_t> TextureManager::get_texture_rgba_16bit(
+    const std::string &id,
+    const TextureType &texture_type,
+    const TextureRes  &texture_res)
+{
+  if (!textures.contains(id))
+    return {};
+
+  Texture tex = this->textures.at(id);
+
+  if (!tex.has_texture(texture_type, texture_res))
+    return {};
+
+  std::string fname = this->storage_path + "/" + tex.get_id() + "_" +
+                      texture_type_as_string.at(texture_type) + "_" +
+                      texture_res_as_string.at(texture_res) + ".png";
+
+  // check if file exists and download it if not
+  std::filesystem::path path = std::filesystem::path(fname);
+
+  if (!std::filesystem::exists(path))
+  {
+    std::string url = tex.get_texture_url(texture_type, texture_res);
+
+    QTD_LOG->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
+    // Q_EMIT this->download_start();
+    download_file(url, fname);
+    // Q_EMIT this->download_end();
+  }
+
+  int                   width, height;
+  std::vector<uint16_t> data = load_png_as_16bit_rgba(fname, width, height);
+  return data;
+}
 
 void TextureManager::json_from(nlohmann::json const &j)
 {
