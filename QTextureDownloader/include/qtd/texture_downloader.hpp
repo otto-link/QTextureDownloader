@@ -33,6 +33,7 @@ public:
   QSize sizeHint() const override;
 
 public slots:
+  void unchecked_all_items();
   void update_sources();
 
 private:
@@ -46,6 +47,7 @@ private:
   TextureRes     res = TextureRes::R1K;
 
   QPushButton        *button_update;
+  QPushButton        *button_uncheck_items;
   QComboBox          *combo_res;
   QStandardItemModel *table_model;
   QTableView         *table_view;

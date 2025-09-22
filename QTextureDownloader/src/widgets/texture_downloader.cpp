@@ -49,6 +49,11 @@ void TextureDownloader::setup_connections()
                 this,
                 &TextureDownloader::update_sources);
 
+  this->connect(this->button_uncheck_items,
+                &QPushButton::clicked,
+                this,
+                &TextureDownloader::unchecked_all_items);
+
   this->connect(this->combo_res,
                 QOverload<int>::of(&QComboBox::currentIndexChanged),
                 [this]()
@@ -63,7 +68,7 @@ void TextureDownloader::setup_connections()
                       break;
                     }
                   }
-		  this->set_texture_res(new_res);
+                  this->set_texture_res(new_res);
                 });
 }
 
@@ -76,11 +81,11 @@ void TextureDownloader::setup_layout()
   layout->setContentsMargins(2, 0, 2, 0);
   this->setLayout(layout);
 
-  this->button_update = new QPushButton("Update sources");
-  layout->addWidget(this->button_update, 0, 0);
+  /// --- first line
 
+  // combo
   this->combo_res = new QComboBox();
-  layout->addWidget(this->combo_res, 0, 1);
+  layout->addWidget(this->combo_res, 0, 0);
 
   for (auto &r : all_texture_res)
   {
@@ -93,7 +98,16 @@ void TextureDownloader::setup_layout()
   if (idx >= 0)
     this->combo_res->setCurrentIndex(idx);
 
-  // table
+  // clear checked items
+  this->button_uncheck_items = new QPushButton("Uncheck items");
+  layout->addWidget(this->button_uncheck_items, 0, 1);
+
+  // update all
+  this->button_update = new QPushButton("Update sources");
+  layout->addWidget(this->button_update, 0, 2);
+
+  // --- table
+
   this->table_model = new QStandardItemModel(0, 3, this);
 
   // labels
@@ -115,10 +129,23 @@ void TextureDownloader::setup_layout()
       QTD_CONFIG->widget.thumbnail_size.height());
   this->table_view->setItemDelegateForColumn(0, new ThumbnailDelegate(this->table_view));
 
-  layout->addWidget(this->table_view, 1, 0, 1, 2);
+  layout->addWidget(this->table_view, 1, 0, 1, 3);
 }
 
 QSize TextureDownloader::sizeHint() const { return QSize(QTD_CONFIG->widget.size_hint); }
+
+void TextureDownloader::unchecked_all_items()
+{
+  for (int row = 0; row < this->table_model->rowCount(); ++row)
+    for (int col = 0; col < this->table_model->columnCount(); ++col)
+    {
+      QStandardItem *item = this->table_model->item(row, col);
+      if (item && item->isCheckable())
+      {
+        item->setCheckState(Qt::Unchecked);
+      }
+    }
+}
 
 void TextureDownloader::update_sources()
 {
@@ -154,9 +181,16 @@ void TextureDownloader::update_table_rows()
     for (auto &r : all_texture_types)
     {
       if (tex.has_texture(r, this->res))
-        items.append(new QStandardItem("Y"));
+      {
+        QStandardItem *check_item = new QStandardItem;
+        check_item->setCheckable(true);
+        check_item->setCheckState(Qt::Unchecked);
+        items.append(check_item);
+      }
       else
-        items.append(new QStandardItem("N"));
+      {
+        items.append(new QStandardItem("Not available"));
+      }
     }
 
     this->table_model->appendRow(items);
