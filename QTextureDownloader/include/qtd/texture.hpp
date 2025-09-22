@@ -1,0 +1,90 @@
+/* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
+   License. The full license is in the file LICENSE, distributed with this software. */
+#pragma once
+#include <memory>
+#include <string>
+
+#include <QImage>
+
+#include "nlohmann/json.hpp"
+
+namespace qtd
+{
+
+enum TextureRes : int
+{
+  R1K,
+  R2K,
+  R4K,
+  R8K,
+  RUNKNOWN
+};
+
+static std::vector<TextureRes> all_texture_res = {TextureRes::R1K,
+                                                  TextureRes::R2K,
+                                                  TextureRes::R4K,
+                                                  TextureRes::R8K};
+
+static std::map<TextureRes, std::string> texture_res_as_string = {
+    {TextureRes::R1K, "1k"},
+    {TextureRes::R2K, "2k"},
+    {TextureRes::R4K, "4k"},
+    {TextureRes::R8K, "8k"},
+    {TextureRes::RUNKNOWN, "unknown"},
+};
+
+enum TextureType : int
+{
+  DIFFUSE,
+  NORMAL,
+  DISPLACEMENT
+};
+
+static std::vector<TextureType> all_texture_types = {TextureType::DIFFUSE,
+                                                     TextureType::NORMAL,
+                                                     TextureType::DISPLACEMENT};
+
+static std::map<TextureType, std::string> texture_type_as_string = {
+    {TextureType::DIFFUSE, "Diffuse"},
+    {TextureType::NORMAL, "Normal"},
+    {TextureType::DISPLACEMENT, "Displacement"},
+};
+
+class Texture
+{
+public:
+  Texture() = default;
+
+  void           json_from(nlohmann::json const &json);
+  nlohmann::json json_to() const;
+
+  std::string             get_name() const;
+  std::string             get_source() const;
+  std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type);
+  const QImage           &get_thumbnail() const;
+  bool                    has_texture(const TextureType &texture_type);
+  bool has_texture(const TextureType &texture_type, const TextureRes &texture_res);
+  void set_id(const std::string &new_id);
+
+  bool from_poly_haven(const std::string    &asset_id,
+                       const nlohmann::json &json_asset_list);
+
+private:
+  // --- Members
+  std::string id; // unique ID
+
+  std::string              name;
+  std::string              source; // download origin
+  std::string              id_from_source;
+  std::string              thumbnail_url;
+  std::vector<std::string> tags;
+  std::array<int, 2>       max_resolution;
+
+  QImage thumbnail;
+
+  std::map<std::string, std::string> diffuse_urls;
+  std::map<std::string, std::string> normal_urls;
+  std::map<std::string, std::string> displacement_urls;
+};
+
+} // namespace qtd
