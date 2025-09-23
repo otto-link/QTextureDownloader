@@ -1,10 +1,10 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
+#include <QApplication>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <QApplication>
 
 #include "qtd/config.hpp"
 #include "qtd/delegates.hpp"
@@ -18,7 +18,7 @@ namespace qtd
 TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
     : QWidget(parent), title(_title)
 {
-  QTD_LOG->trace("TextureDownloader::TextureDownloader");
+  Logger::log()->trace("TextureDownloader::TextureDownloader");
 
   this->setWindowTitle(this->title.c_str());
   this->setFocusPolicy(Qt::StrongFocus);
@@ -37,7 +37,7 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
 
 void TextureDownloader::retrieve_selected_textures()
 {
-  QTD_LOG->trace("TextureDownloader::retrieve_selected_textures");
+  Logger::log()->trace("TextureDownloader::retrieve_selected_textures");
 
   std::vector<std::string> texture_paths;
 
@@ -75,7 +75,7 @@ void TextureDownloader::retrieve_selected_textures()
 
 void TextureDownloader::set_texture_res(const TextureRes &new_res)
 {
-  QTD_LOG->trace("TextureDownloader::set_texture_res");
+  Logger::log()->trace("TextureDownloader::set_texture_res");
 
   if (new_res == TextureRes::RUNKNOWN || new_res == this->res)
     return;
@@ -86,7 +86,7 @@ void TextureDownloader::set_texture_res(const TextureRes &new_res)
 
 void TextureDownloader::setup_connections()
 {
-  QTD_LOG->trace("TextureDownloader::setup_connections");
+  Logger::log()->trace("TextureDownloader::setup_connections");
 
   this->connect(this->button_get_selected,
                 &QPushButton::clicked,
@@ -123,7 +123,7 @@ void TextureDownloader::setup_connections()
 
 void TextureDownloader::setup_layout()
 {
-  QTD_LOG->trace("TextureDownloader::setup_layout");
+  Logger::log()->trace("TextureDownloader::setup_layout");
 
   // create and assign new layout
   QGridLayout *layout = new QGridLayout(this);
@@ -204,7 +204,7 @@ void TextureDownloader::unchecked_all_items()
 
 void TextureDownloader::update_sources()
 {
-  QTD_LOG->trace("TextureDownloader::update_sources");
+  Logger::log()->trace("TextureDownloader::update_sources");
 
   auto reply = QMessageBox::question(
       this,
@@ -215,20 +215,20 @@ void TextureDownloader::update_sources()
 
   if (reply != QMessageBox::Yes)
   {
-    QTD_LOG->info("TextureDownloader::update_sources cancelled by user");
+    Logger::log()->info("TextureDownloader::update_sources cancelled by user");
     return;
   }
 
   // block UI
   QProgressDialog progress(tr("Updating sources..."), QString(), 0, 0, this);
   progress.setWindowModality(Qt::ApplicationModal);
-  progress.setCancelButton(nullptr);  
-  progress.setMinimumDuration(0);     // show immediately
+  progress.setCancelButton(nullptr);
+  progress.setMinimumDuration(0); // show immediately
   progress.show();
 
   // process events so dialog is painted before heavy work
   QApplication::processEvents();
-  
+
   this->texture_manager.update();
   this->texture_manager.save();
   this->update_table_rows();
@@ -238,7 +238,7 @@ void TextureDownloader::update_sources()
 
 void TextureDownloader::update_table_rows()
 {
-  QTD_LOG->trace("TextureDownloader::update_table_rows");
+  Logger::log()->trace("TextureDownloader::update_table_rows");
 
   this->table_model->removeRows(0, this->table_model->rowCount());
 

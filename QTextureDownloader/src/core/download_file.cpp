@@ -25,7 +25,7 @@ bool download_file(const std::string &url, const std::string &file_path)
 
   if (reply->error() != QNetworkReply::NoError)
   {
-    QTD_LOG->error("download_file: download error");
+    Logger::log()->error("download_file: download error");
     reply->deleteLater();
     return false;
   }
@@ -33,7 +33,7 @@ bool download_file(const std::string &url, const std::string &file_path)
   QFile file(file_path.c_str());
   if (!file.open(QIODevice::WriteOnly))
   {
-    QTD_LOG->error("download_file: error writing file: {}", file_path);
+    Logger::log()->error("download_file: error writing file: {}", file_path);
     reply->deleteLater();
     return false;
   }

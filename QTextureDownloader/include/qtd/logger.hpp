@@ -5,8 +5,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#define QTD_LOG qtd::Logger::log()
-
 namespace qtd
 {
 

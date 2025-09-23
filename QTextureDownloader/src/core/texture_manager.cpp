@@ -17,14 +17,14 @@ namespace qtd
 TextureManager::TextureManager(const std::string &storage_path_)
     : storage_path(storage_path_)
 {
-  QTD_LOG->trace("TextureManager::TextureManager");
+  Logger::log()->trace("TextureManager::TextureManager");
 
   // create storage
   std::filesystem::path dir = std::filesystem::path(this->storage_path);
   if (!std::filesystem::exists(dir))
   {
-    QTD_LOG->info("TextureManager::TextureManager: creating storage repertory {}",
-                  dir.string());
+    Logger::log()->info("TextureManager::TextureManager: creating storage repertory {}",
+                        dir.string());
     std::filesystem::create_directories(dir);
   }
 }
@@ -92,7 +92,7 @@ std::string TextureManager::try_download_texture(const TextureKey &texture_key,
   {
     std::string url = tex.get_texture_url(texture_key.type, texture_key.res);
 
-    QTD_LOG->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
+    Logger::log()->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
     download_file(url, fname);
   }
 
@@ -101,13 +101,13 @@ std::string TextureManager::try_download_texture(const TextureKey &texture_key,
 
 void TextureManager::update()
 {
-  QTD_LOG->trace("TextureManager::update");
+  Logger::log()->trace("TextureManager::update");
   this->update_from_poly_haven();
 }
 
 void TextureManager::update_from_poly_haven()
 {
-  QTD_LOG->trace("TextureManager::update_from_poly_haven");
+  Logger::log()->trace("TextureManager::update_from_poly_haven");
 
   // --- retrieve asset list
 
@@ -119,7 +119,8 @@ void TextureManager::update_from_poly_haven()
 
   if (json_asset_list.empty())
   {
-    QTD_LOG->error("TextureManager::update_from_poly_haven: could not fetch asset list");
+    Logger::log()->error(
+        "TextureManager::update_from_poly_haven: could not fetch asset list");
     return;
   }
 
@@ -135,7 +136,7 @@ void TextureManager::update_from_poly_haven()
     // build up a unique ID based on the source and the source ID
     const std::string id = "PolyHaven_" + source_id;
 
-    QTD_LOG->info("TextureManager::update_from_poly_haven: texture {}", id);
+    Logger::log()->info("TextureManager::update_from_poly_haven: texture {}", id);
 
     // create and/or replace
     Texture new_texture = Texture();

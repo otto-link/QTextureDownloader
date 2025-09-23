@@ -20,11 +20,11 @@ nlohmann::json json_from_file(const std::string &fname)
   {
     file >> json;
     file.close();
-    QTD_LOG->trace("json_from_file: JSON successfully loaded from {}", fname);
+    Logger::log()->trace("json_from_file: JSON successfully loaded from {}", fname);
   }
   else
   {
-    QTD_LOG->error("json_from_file: Could not open file {} to load JSON", fname);
+    Logger::log()->error("json_from_file: Could not open file {} to load JSON", fname);
   }
 
   return json;
@@ -51,11 +51,12 @@ void json_to_file(const nlohmann::json &json,
         existing.merge_patch(json);
         final_json = existing;
 
-        QTD_LOG->trace("json_to_file: merged JSON with existing content in {}", fname);
+        Logger::log()->trace("json_to_file: merged JSON with existing content in {}",
+                             fname);
       }
       catch (const std::exception &e)
       {
-        QTD_LOG->warn(
+        Logger::log()->warn(
             "json_to_file: Could not parse existing JSON in {} ({}). Overwriting "
             "instead.",
             fname,
@@ -69,11 +70,11 @@ void json_to_file(const nlohmann::json &json,
   {
     outfile << final_json.dump(4);
     outfile.close();
-    QTD_LOG->trace("json_to_file: JSON successfully written to {}", fname);
+    Logger::log()->trace("json_to_file: JSON successfully written to {}", fname);
   }
   else
   {
-    QTD_LOG->error("json_to_file: Could not open file {} to save JSON", fname);
+    Logger::log()->error("json_to_file: Could not open file {} to save JSON", fname);
   }
 }
 

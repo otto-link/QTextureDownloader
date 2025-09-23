@@ -30,7 +30,7 @@ inline bool json_safe_get(const nlohmann::json &j, const std::string &key, T &va
   }
   else
   {
-    QTD_LOG->error("json_safe_get: JSON parse error: unknown key {}", key);
+    Logger::log()->error("json_safe_get: JSON parse error: unknown key {}", key);
     return false;
   }
 }

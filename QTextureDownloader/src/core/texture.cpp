@@ -28,15 +28,15 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
                               const nlohmann::json &json_asset_list)
 {
 
-  QTD_LOG->trace("Texture::from_poly_haven: {}", asset_id);
+  Logger::log()->trace("Texture::from_poly_haven: {}", asset_id);
 
   bool ret = true; // means ok so far
 
   // base data
   if (!json_asset_list.contains(asset_id))
   {
-    QTD_LOG->error("Texture::from_poly_haven: info - JSON parse error, asset {}",
-                   asset_id);
+    Logger::log()->error("Texture::from_poly_haven: info - JSON parse error, asset {}",
+                         asset_id);
     return false;
   }
 
@@ -57,8 +57,8 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
 
     if (this->thumbnail.isNull())
     {
-      QTD_LOG->error("Texture::from_poly_haven: thumbnail download error, asset {}",
-                     asset_id);
+      Logger::log()->error("Texture::from_poly_haven: thumbnail download error, asset {}",
+                           asset_id);
       return false;
     }
   }
@@ -71,7 +71,7 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
 
     if (j.empty())
     {
-      QTD_LOG->error(
+      Logger::log()->error(
           "Texture::from_poly_haven: files - JSON parse or download error, asset {}",
           asset_id);
       return false;

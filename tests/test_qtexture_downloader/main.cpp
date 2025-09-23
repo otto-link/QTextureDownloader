@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[])
 {
-  QTD_LOG->info("testing qtexture_downloader...");
+  qtd::Logger::log()->info("testing qtexture_downloader...");
 
   qputenv("QT_LOGGING_RULES", QTD_QPUTENV_QT_LOGGING_RULES);
   QApplication app(argc, argv);
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
               &qtd::TextureDownloader::textures_retrieved,
               [](const std::vector<std::string> &paths)
               {
-		std::cout << "Texture paths:\n";
+                std::cout << "Texture paths:\n";
                 for (auto &s : paths)
                   std::cout << " - " << s << "\n";
               });
