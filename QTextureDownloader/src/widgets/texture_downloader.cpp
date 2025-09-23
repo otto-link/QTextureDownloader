@@ -34,7 +34,15 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
   this->texture_manager.try_download_texture(
       {"PolyHaven_aerial_asphalt_01", TextureType::NORMAL, TextureRes::R1K});
 }
+  
+TextureDownloader::~TextureDownloader()
+{
+  Logger::log()->trace("TextureDownloader::~TextureDownloader");
 
+  this->texture_manager.save();  
+  QWidget::~QWidget();
+}
+  
 void TextureDownloader::retrieve_selected_textures()
 {
   Logger::log()->trace("TextureDownloader::retrieve_selected_textures");

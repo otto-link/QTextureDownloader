@@ -22,6 +22,7 @@ class TextureDownloader : public QWidget
 
 public:
   explicit TextureDownloader(const std::string &_title = "", QWidget *parent = nullptr);
+ ~TextureDownloader();
 
   // --- Serialization
   //   void           json_from(nlohmann::json const &json);
