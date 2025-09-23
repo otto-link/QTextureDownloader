@@ -72,12 +72,24 @@ R""(
     {
 	width: 14px;
 	height: 14px;
-	border: 1px solid #4772b3;
+	border: 1px solid #DFE1E2;
     }
 
     QCheckBox::indicator:checked
     {
-	background-color: #4772b3;
+	background-color: #DFE1E2;
+    }
+
+    QTableView::indicator
+    {
+    	width: 14px;
+	height: 14px;
+	border: 1px solid #DFE1E2;
+    }
+    
+    QTableView::indicator:checked
+    {
+	background-color: #DFE1E2;
     }
  
     /* QComboBox */
