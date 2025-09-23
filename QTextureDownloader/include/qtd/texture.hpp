@@ -67,6 +67,7 @@ public:
   nlohmann::json json_to() const;
 
   std::string             get_id() const;
+  bool                    get_is_pinned() const;
   std::string             get_name() const;
   std::string             get_source() const;
   std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type) const;
@@ -89,7 +90,7 @@ private:
   std::string              id_from_source;
   std::string              thumbnail_url;
   std::vector<std::string> tags;
-  std::array<int, 2>       max_resolution;
+  bool                     is_pinned = false;
 
   QImage thumbnail;
 

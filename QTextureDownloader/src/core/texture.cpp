@@ -48,7 +48,6 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
   ret |= json_safe_get(j, "name", this->name);
   ret |= json_safe_get(j, "thumbnail_url", this->thumbnail_url);
   ret |= json_safe_get(j, "tags", this->tags);
-  ret |= json_safe_get(j, "max_resolution", this->max_resolution);
 
   // thumbnail
   {
@@ -100,6 +99,8 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
 }
 
 std::string Texture::get_id() const { return this->id; }
+
+bool Texture::get_is_pinned() const { return this->is_pinned; }
 
 std::string Texture::get_name() const { return this->name; }
 
@@ -213,7 +214,7 @@ void Texture::json_from(nlohmann::json const &j)
   json_safe_get(j, "id_from_source", id_from_source);
   json_safe_get(j, "thumbnail_url", thumbnail_url);
   json_safe_get(j, "tags", tags);
-  json_safe_get(j, "max_resolution", max_resolution);
+  json_safe_get(j, "is_pinned", is_pinned);
 
   if (j.contains("thumbnail") && j["thumbnail"].is_string())
     thumbnail = qimage_from_base64(j["thumbnail"].get<std::string>());
@@ -233,7 +234,7 @@ nlohmann::json Texture::json_to() const
           {"id_from_source", id_from_source},
           {"thumbnail_url", thumbnail_url},
           {"tags", tags},
-          {"max_resolution", max_resolution},
+          {"is_pinned", is_pinned},
           {"thumbnail", qimage_to_base64(thumbnail)},
           {"diffuse_urls", diffuse_urls},
           {"normal_urls", normal_urls},

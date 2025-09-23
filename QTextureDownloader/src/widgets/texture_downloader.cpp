@@ -34,15 +34,15 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
   this->texture_manager.try_download_texture(
       {"PolyHaven_aerial_asphalt_01", TextureType::NORMAL, TextureRes::R1K});
 }
-  
+
 TextureDownloader::~TextureDownloader()
 {
   Logger::log()->trace("TextureDownloader::~TextureDownloader");
 
-  this->texture_manager.save();  
+  this->texture_manager.save();
   QWidget::~QWidget();
 }
-  
+
 void TextureDownloader::retrieve_selected_textures()
 {
   Logger::log()->trace("TextureDownloader::retrieve_selected_textures");
@@ -56,21 +56,25 @@ void TextureDownloader::retrieve_selected_textures()
     {
       QStandardItem *item = this->table_model->item(row, col);
 
-      if (item && item->isCheckable() && item->checkState() == Qt::Checked)
+      // TODO hardcoded stuffs...
+
+      // avoid col == 1: is_pinned
+      if (item && item->isCheckable() && item->checkState() == Qt::Checked && col != 1)
       {
         TextureType type;
 
         // TODO hardcoded stuffs...
 
-        if (col == 4)
+        // which type?
+        if (col == 5)
           type = TextureType::DIFFUSE;
-        else if (col == 5)
+        else if (col == 6)
           type = TextureType::NORMAL;
         else
           type = TextureType::DISPLACEMENT;
 
         // retrieve ID
-        QStandardItem *item_id = this->table_model->item(row, 1);
+        QStandardItem *item_id = this->table_model->item(row, 2); // TODO hardcoded
         TextureKey     key(item_id->text().toStdString(), type, this->res);
         std::string    path = this->texture_manager.try_download_texture(key);
 
@@ -174,7 +178,7 @@ void TextureDownloader::setup_layout()
   this->table_model = new QStandardItemModel(0, 3, this);
 
   // labels
-  QStringList labels = {"Thumbnail", "ID", "Name", "Source"};
+  QStringList labels = {"Thumbnail", "Pinned", "ID", "Name", "Source"};
   for (auto &r : all_texture_types)
   {
     std::string type_name = texture_type_as_string.at(r);
@@ -202,10 +206,13 @@ void TextureDownloader::unchecked_all_items()
   for (int row = 0; row < this->table_model->rowCount(); ++row)
     for (int col = 0; col < this->table_model->columnCount(); ++col)
     {
-      QStandardItem *item = this->table_model->item(row, col);
-      if (item && item->isCheckable())
+      if (col != 1) // is_pinned
       {
-        item->setCheckState(Qt::Unchecked);
+        QStandardItem *item = this->table_model->item(row, col);
+        if (item && item->isCheckable())
+        {
+          item->setCheckState(Qt::Unchecked);
+        }
       }
     }
 }
@@ -258,10 +265,18 @@ void TextureDownloader::update_table_rows()
     QStandardItem *img_item = new QStandardItem;
     img_item->setData(pix, Qt::DecorationRole);
 
-    QList<QStandardItem *> items = {img_item,
-                                    new QStandardItem(id.c_str()),
-                                    new QStandardItem(tex.get_name().c_str()),
-                                    new QStandardItem(tex.get_source().c_str())};
+    QList<QStandardItem *> items = {img_item};
+
+    {
+      QStandardItem *check_item = new QStandardItem;
+      check_item->setCheckable(true);
+      check_item->setCheckState(tex.get_is_pinned() ? Qt::Checked : Qt::Unchecked);
+      items.append(check_item);
+    }
+
+    items.append(new QStandardItem(id.c_str()));
+    items.append(new QStandardItem(tex.get_name().c_str()));
+    items.append(new QStandardItem(tex.get_source().c_str()));
 
     // add textures
     for (auto &r : all_texture_types)
