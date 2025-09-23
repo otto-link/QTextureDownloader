@@ -14,19 +14,23 @@ void ThumbnailDelegate::paint(QPainter                   *painter,
   painter->save();
 
   QPixmap pix = index.data(Qt::DecorationRole).value<QPixmap>();
-  QRect   r = option.rect;
-  r.adjust(2, 2, -2, -2);
 
-  // scale to fill available rect, preserving aspect ratio
-  QPixmap scaled = pix.scaled(r.size(),
-                              Qt::KeepAspectRatio, // ByExpanding,
-                              Qt::SmoothTransformation);
+  if (!pix.isNull())
+  {
+    QRect r = option.rect;
+    r.adjust(2, 2, -2, -2);
 
-  // center inside rect if aspect doesn’t match
-  QPoint topLeft(r.x() + (r.width() - scaled.width()) / 2,
-                 r.y() + (r.height() - scaled.height()) / 2);
+    // scale to fill available rect, preserving aspect ratio
+    QPixmap scaled = pix.scaled(r.size(),
+                                Qt::KeepAspectRatio, // ByExpanding,
+                                Qt::SmoothTransformation);
 
-  painter->drawPixmap(topLeft, scaled);
+    // center inside rect if aspect doesn’t match
+    QPoint topLeft(r.x() + (r.width() - scaled.width()) / 2,
+                   r.y() + (r.height() - scaled.height()) / 2);
+
+    painter->drawPixmap(topLeft, scaled);
+  }
 
   painter->restore();
 }

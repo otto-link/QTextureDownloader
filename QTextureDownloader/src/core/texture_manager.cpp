@@ -167,7 +167,7 @@ void TextureManager::update_from_poly_haven()
         url);
     ok = download_file(url, fname);
 
-    // // TODO TEST
+    // TODO TEST
     // k++;
     // if (k > 6)
     //   break;

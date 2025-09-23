@@ -1,5 +1,7 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
+#include <filesystem>
+
 #include <QApplication>
 #include <QGridLayout>
 #include <QHeaderView>
@@ -346,18 +348,13 @@ void TextureDownloader::update_table_rows()
     QList<QStandardItem *> items;
 
     // thumbnail
-    QImage img = QImage(this->texture_manager.get_thumbnail_path(id).c_str());
-
     QStandardItem *img_item = new QStandardItem;
+    QImage         img = QImage(this->texture_manager.get_thumbnail_path(id).c_str());
 
     if (!img.isNull())
     {
       QPixmap pix = QPixmap::fromImage(img);
       img_item->setData(pix, Qt::DecorationRole);
-    }
-    else
-    {
-      img_item->setText("No thumbnail");
     }
 
     items.append(img_item);
