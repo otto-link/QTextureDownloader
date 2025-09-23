@@ -1,5 +1,7 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
+#include <iostream>
+
 #include <QApplication>
 
 #include "qtexture_downloader.hpp"
@@ -14,18 +16,15 @@ int main(int argc, char *argv[])
   qtd::TextureDownloader *dw = new qtd::TextureDownloader("Test widget");
   dw->show();
 
-  // qtd::TextureManager tm;
-
-  // // tm.update();
-  // // tm.save();
-
-  // tm.load();
-
-  // tm.file_from("toto.json");
-  // tm.file_to("toto.json");
-
-  // qtd::Texture tex;
-  // tex.from_poly_haven("rocky_terrain_02");
+  // output for dbg
+  dw->connect(dw,
+              &qtd::TextureDownloader::textures_retrieved,
+              [](const std::vector<std::string> &paths)
+              {
+		std::cout << "Texture paths:\n";
+                for (auto &s : paths)
+                  std::cout << " - " << s << "\n";
+              });
 
   return app.exec();
 }

@@ -7,6 +7,33 @@
 namespace qtd
 {
 
+// --------------------------
+// TextureKey
+// --------------------------
+
+// facilitate texture search by id/type/resolution
+struct TextureKey
+{
+  std::string id;
+  TextureType type;
+  TextureRes  res;
+
+  bool operator==(const TextureKey &other) const
+  {
+    return id == other.id && type == other.type && res == other.res;
+  }
+
+  std::string to_string() const
+  {
+    return this->id + "_" + texture_type_as_string.at(this->type) + "_" +
+           texture_res_as_string.at(this->res);
+  }
+};
+
+// --------------------------
+// TextureManager
+// --------------------------
+
 class TextureManager
 {
 public:
@@ -14,9 +41,15 @@ public:
 
   std::map<std::string, Texture> &get_textures();
 
-  std::vector<uint16_t> get_texture_rgba_16bit(const std::string &id,
-                                               const TextureType &texture_type,
-                                               const TextureRes  &texture_res);
+  std::string get_texture_path(const TextureKey &texture_key) const;
+
+  //   std::vector<uint16_t> get_texture_rgba_16bit(const std::string &id,
+  //                                                const TextureType &texture_type,
+  //                                                const TextureRes  &texture_res) const;
+
+  // does not override existing file (returns path to file)
+  std::string try_download_texture(const TextureKey &texture_key,
+                                   bool              force_download = false) const;
 
   void load();
   void save() const;

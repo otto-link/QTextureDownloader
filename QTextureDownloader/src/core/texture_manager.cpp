@@ -42,39 +42,9 @@ void TextureManager::file_to(const std::string &fname) const
 
 std::map<std::string, Texture> &TextureManager::get_textures() { return this->textures; }
 
-std::vector<uint16_t> TextureManager::get_texture_rgba_16bit(
-    const std::string &id,
-    const TextureType &texture_type,
-    const TextureRes  &texture_res)
+std::string TextureManager::get_texture_path(const TextureKey &texture_key) const
 {
-  if (!textures.contains(id))
-    return {};
-
-  Texture tex = this->textures.at(id);
-
-  if (!tex.has_texture(texture_type, texture_res))
-    return {};
-
-  std::string fname = this->storage_path + "/" + tex.get_id() + "_" +
-                      texture_type_as_string.at(texture_type) + "_" +
-                      texture_res_as_string.at(texture_res) + ".png";
-
-  // check if file exists and download it if not
-  std::filesystem::path path = std::filesystem::path(fname);
-
-  if (!std::filesystem::exists(path))
-  {
-    std::string url = tex.get_texture_url(texture_type, texture_res);
-
-    QTD_LOG->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
-    // Q_EMIT this->download_start();
-    download_file(url, fname);
-    // Q_EMIT this->download_end();
-  }
-
-  int                   width, height;
-  std::vector<uint16_t> data = load_png_as_16bit_rgba(fname, width, height);
-  return data;
+  return this->storage_path + "/" + texture_key.to_string() + ".png";
 }
 
 void TextureManager::json_from(nlohmann::json const &j)
@@ -101,6 +71,33 @@ nlohmann::json TextureManager::json_to() const
 void TextureManager::load() { this->file_from(this->storage_path + "/db.json"); }
 
 void TextureManager::save() const { this->file_to(this->storage_path + "/db.json"); }
+
+std::string TextureManager::try_download_texture(const TextureKey &texture_key,
+                                                 bool              force_download) const
+{
+  if (!textures.contains(texture_key.id))
+    return "";
+
+  Texture tex = this->textures.at(texture_key.id);
+
+  if (!tex.has_texture(texture_key.type, texture_key.res))
+    return "";
+
+  std::string fname = this->get_texture_path(texture_key);
+
+  // check if file exists and download it if not
+  std::filesystem::path path = std::filesystem::path(fname);
+
+  if (!std::filesystem::exists(path) || force_download)
+  {
+    std::string url = tex.get_texture_url(texture_key.type, texture_key.res);
+
+    QTD_LOG->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
+    download_file(url, fname);
+  }
+
+  return fname;
+}
 
 void TextureManager::update()
 {
@@ -138,7 +135,7 @@ void TextureManager::update_from_poly_haven()
     // build up a unique ID based on the source and the source ID
     const std::string id = "PolyHaven_" + source_id;
 
-    QTD_LOG->debug("{}", id);
+    QTD_LOG->info("TextureManager::update_from_poly_haven: texture {}", id);
 
     // create and/or replace
     Texture new_texture = Texture();
@@ -150,7 +147,7 @@ void TextureManager::update_from_poly_haven()
 
     // TODO TEST
     k++;
-    if (k > 3)
+    if (k > 6)
       break;
   }
 }

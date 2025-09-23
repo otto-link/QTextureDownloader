@@ -20,10 +20,6 @@ void           json_to_file(const nlohmann::json &json,
                             const std::string    &fname,
                             bool                  merge_with_existing_content = false);
 
-std::vector<uint16_t> load_png_as_16bit_rgba(const std::string &path,
-                                             int               &width,
-                                             int               &height);
-
 std::string qimage_to_base64(const QImage &img);
 QImage      qimage_from_base64(const std::string &b64);
 

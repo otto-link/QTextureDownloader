@@ -28,7 +28,7 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
                               const nlohmann::json &json_asset_list)
 {
 
-  QTD_LOG->debug("Texture::from_poly_haven: {}", asset_id);
+  QTD_LOG->trace("Texture::from_poly_haven: {}", asset_id);
 
   bool ret = true; // means ok so far
 
@@ -105,7 +105,8 @@ std::string Texture::get_name() const { return this->name; }
 
 std::string Texture::get_source() const { return this->source; }
 
-std::vector<TextureRes> Texture::get_texture_resolutions(const TextureType &texture_type)
+std::vector<TextureRes> Texture::get_texture_resolutions(
+    const TextureType &texture_type) const
 {
   std::vector<TextureRes>            out;
   std::map<std::string, std::string> map;
@@ -135,7 +136,7 @@ std::vector<TextureRes> Texture::get_texture_resolutions(const TextureType &text
 }
 
 std::string Texture::get_texture_url(const TextureType &texture_type,
-                                     const TextureRes  &texture_res)
+                                     const TextureRes  &texture_res) const
 {
   std::map<std::string, std::string> map;
   std::string                        res_key;
@@ -172,7 +173,7 @@ std::string Texture::get_texture_url(const TextureType &texture_type,
   return map.at(res_key);
 }
 
-bool Texture::has_texture(const TextureType &texture_type)
+bool Texture::has_texture(const TextureType &texture_type) const
 {
   switch (texture_type)
   {
@@ -190,7 +191,8 @@ bool Texture::has_texture(const TextureType &texture_type)
   return false;
 }
 
-bool Texture::has_texture(const TextureType &texture_type, const TextureRes &texture_res)
+bool Texture::has_texture(const TextureType &texture_type,
+                          const TextureRes  &texture_res) const
 {
   // type first
   if (!this->has_texture(texture_type))

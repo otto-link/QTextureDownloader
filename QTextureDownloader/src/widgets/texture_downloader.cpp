@@ -2,6 +2,9 @@
    License. The full license is in the file LICENSE, distributed with this software. */
 #include <QGridLayout>
 #include <QHeaderView>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QApplication>
 
 #include "qtd/config.hpp"
 #include "qtd/delegates.hpp"
@@ -28,9 +31,46 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
   this->texture_manager.load();
   this->update_table_rows();
 
-  this->texture_manager.get_texture_rgba_16bit("PolyHaven_aerial_asphalt_01",
-                                               TextureType::NORMAL,
-                                               TextureRes::R1K);
+  this->texture_manager.try_download_texture(
+      {"PolyHaven_aerial_asphalt_01", TextureType::NORMAL, TextureRes::R1K});
+}
+
+void TextureDownloader::retrieve_selected_textures()
+{
+  QTD_LOG->trace("TextureDownloader::retrieve_selected_textures");
+
+  std::vector<std::string> texture_paths;
+
+  // list checked items
+
+  for (int row = 0; row < this->table_model->rowCount(); ++row)
+    for (int col = 0; col < this->table_model->columnCount(); ++col)
+    {
+      QStandardItem *item = this->table_model->item(row, col);
+
+      if (item && item->isCheckable() && item->checkState() == Qt::Checked)
+      {
+        TextureType type;
+
+        // TODO hardcoded stuffs...
+
+        if (col == 4)
+          type = TextureType::DIFFUSE;
+        else if (col == 5)
+          type = TextureType::NORMAL;
+        else
+          type = TextureType::DISPLACEMENT;
+
+        // retrieve ID
+        QStandardItem *item_id = this->table_model->item(row, 1);
+        TextureKey     key(item_id->text().toStdString(), type, this->res);
+        std::string    path = this->texture_manager.try_download_texture(key);
+
+        texture_paths.push_back(path);
+      }
+    }
+
+  Q_EMIT this->textures_retrieved(texture_paths);
 }
 
 void TextureDownloader::set_texture_res(const TextureRes &new_res)
@@ -47,6 +87,11 @@ void TextureDownloader::set_texture_res(const TextureRes &new_res)
 void TextureDownloader::setup_connections()
 {
   QTD_LOG->trace("TextureDownloader::setup_connections");
+
+  this->connect(this->button_get_selected,
+                &QPushButton::clicked,
+                this,
+                &TextureDownloader::retrieve_selected_textures);
 
   this->connect(this->button_update,
                 &QPushButton::clicked,
@@ -87,9 +132,15 @@ void TextureDownloader::setup_layout()
 
   /// --- first line
 
+  int col = 0;
+
+  // get textures
+  this->button_get_selected = new QPushButton("Get selected");
+  layout->addWidget(this->button_get_selected, 0, col++);
+
   // combo
   this->combo_res = new QComboBox();
-  layout->addWidget(this->combo_res, 0, 0);
+  layout->addWidget(this->combo_res, 0, col++);
 
   for (auto &r : all_texture_res)
   {
@@ -104,11 +155,11 @@ void TextureDownloader::setup_layout()
 
   // clear checked items
   this->button_uncheck_items = new QPushButton("Uncheck items");
-  layout->addWidget(this->button_uncheck_items, 0, 1);
+  layout->addWidget(this->button_uncheck_items, 0, col++);
 
   // update all
   this->button_update = new QPushButton("Update sources");
-  layout->addWidget(this->button_update, 0, 2);
+  layout->addWidget(this->button_update, 0, col++);
 
   // --- table
 
@@ -133,7 +184,7 @@ void TextureDownloader::setup_layout()
       QTD_CONFIG->widget.thumbnail_size.height());
   this->table_view->setItemDelegateForColumn(0, new ThumbnailDelegate(this->table_view));
 
-  layout->addWidget(this->table_view, 1, 0, 1, 3);
+  layout->addWidget(this->table_view, 1, 0, 1, 4);
 }
 
 QSize TextureDownloader::sizeHint() const { return QSize(QTD_CONFIG->widget.size_hint); }
@@ -155,11 +206,34 @@ void TextureDownloader::update_sources()
 {
   QTD_LOG->trace("TextureDownloader::update_sources");
 
-  // TODO add dialog box "sure?"
+  auto reply = QMessageBox::question(
+      this,
+      tr("Update Sources"),
+      tr("This process may take a while.\nAre you sure you want to continue?"),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
 
+  if (reply != QMessageBox::Yes)
+  {
+    QTD_LOG->info("TextureDownloader::update_sources cancelled by user");
+    return;
+  }
+
+  // block UI
+  QProgressDialog progress(tr("Updating sources..."), QString(), 0, 0, this);
+  progress.setWindowModality(Qt::ApplicationModal);
+  progress.setCancelButton(nullptr);  
+  progress.setMinimumDuration(0);     // show immediately
+  progress.show();
+
+  // process events so dialog is painted before heavy work
+  QApplication::processEvents();
+  
   this->texture_manager.update();
   this->texture_manager.save();
   this->update_table_rows();
+
+  progress.close();
 }
 
 void TextureDownloader::update_table_rows()

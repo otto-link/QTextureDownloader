@@ -11,6 +11,10 @@
 namespace qtd
 {
 
+// --------------------------
+// enums...
+// --------------------------
+
 enum TextureRes : int
 {
   R1K,
@@ -50,6 +54,10 @@ static std::map<TextureType, std::string> texture_type_as_string = {
     {TextureType::DISPLACEMENT, "Displacement"},
 };
 
+// --------------------------
+// Texture
+// --------------------------
+
 class Texture
 {
 public:
@@ -61,12 +69,12 @@ public:
   std::string             get_id() const;
   std::string             get_name() const;
   std::string             get_source() const;
-  std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type);
+  std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type) const;
   std::string             get_texture_url(const TextureType &texture_type,
-                                          const TextureRes  &texture_res);
+                                          const TextureRes  &texture_res) const;
   const QImage           &get_thumbnail() const;
-  bool                    has_texture(const TextureType &texture_type);
-  bool has_texture(const TextureType &texture_type, const TextureRes &texture_res);
+  bool                    has_texture(const TextureType &texture_type) const;
+  bool has_texture(const TextureType &texture_type, const TextureRes &texture_res) const;
   void set_id(const std::string &new_id);
 
   bool from_poly_haven(const std::string    &asset_id,

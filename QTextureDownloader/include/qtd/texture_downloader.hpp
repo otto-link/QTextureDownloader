@@ -32,7 +32,11 @@ public:
   // --- QWidget interface
   QSize sizeHint() const override;
 
+signals:
+  void textures_retrieved(const std::vector<std::string> &texture_paths);
+
 public slots:
+  void retrieve_selected_textures();
   void unchecked_all_items();
   void update_sources();
 
@@ -46,6 +50,7 @@ private:
   TextureManager texture_manager;
   TextureRes     res = TextureRes::R1K;
 
+  QPushButton        *button_get_selected;
   QPushButton        *button_update;
   QPushButton        *button_uncheck_items;
   QComboBox          *combo_res;
