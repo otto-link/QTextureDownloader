@@ -156,6 +156,8 @@ std::string Texture::get_texture_url(const TextureType &texture_type,
   case TextureRes::R8K:
     res_key = "8k";
     break;
+  case TextureRes::RUNKNOWN:
+    res_key = "?";
   }
 
   return map.at(res_key);

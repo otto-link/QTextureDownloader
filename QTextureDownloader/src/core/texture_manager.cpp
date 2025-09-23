@@ -169,7 +169,7 @@ void TextureManager::update_from_poly_haven()
 
     // TODO TEST
     // k++;
-    // if (k > 6)
+    // if (k > 30)
     //   break;
   }
 }

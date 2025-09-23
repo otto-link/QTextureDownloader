@@ -247,9 +247,13 @@ void TextureDownloader::setup_layout()
   this->table_view->setSortingEnabled(true);
   this->table_view->horizontalHeader()->setStretchLastSection(true);
   this->table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  this->table_view->setItemDelegateForColumn(0, new ThumbnailDelegate(this->table_view));
+
+  this->table_view->horizontalHeader()->setSectionResizeMode(
+      0,
+      QHeaderView::ResizeToContents);
   this->table_view->verticalHeader()->setDefaultSectionSize(
       QTD_CONFIG->widget.thumbnail_size.height());
-  this->table_view->setItemDelegateForColumn(0, new ThumbnailDelegate(this->table_view));
 
   layout->addWidget(this->table_view, 1, 0, 1, 4);
 }
