@@ -3,6 +3,8 @@
 #include <filesystem>
 
 #include <QApplication>
+#include <QDir>
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QMenu>
@@ -43,6 +45,24 @@ TextureDownloader::~TextureDownloader()
 
   this->texture_manager.save();
   QWidget::~QWidget();
+}
+
+void TextureDownloader::choose_storage_path()
+{
+  QString dir = QFileDialog::getExistingDirectory(
+      this,
+      tr("Select Storage Directory"),
+      QString::fromStdString(this->texture_manager.get_storage_path()),
+      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+  if (!dir.isEmpty())
+  {
+    this->texture_manager.set_storage_path(dir.toStdString());
+    this->update_table_rows();
+
+    Logger::log()->info("Storage path set to: {}",
+                        this->texture_manager.get_storage_path());
+  }
 }
 
 void TextureDownloader::purge_database()
@@ -271,6 +291,17 @@ void TextureDownloader::setup_menu_bar()
     file_menu->addAction(action);
 
     this->connect(action, &QAction::triggered, this, &TextureDownloader::update_sources);
+  }
+
+  // storage path
+  {
+    QAction *action = new QAction(tr("&Change storage path"), this);
+    file_menu->addAction(action);
+
+    this->connect(action,
+                  &QAction::triggered,
+                  this,
+                  &TextureDownloader::choose_storage_path);
   }
 
   file_menu->addSeparator();

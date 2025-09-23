@@ -42,6 +42,8 @@ void TextureManager::file_to(const std::string &fname) const
   json_to_file(this->json_to(), fname);
 }
 
+std::string TextureManager::get_storage_path() const { return this->storage_path; }
+
 std::map<std::string, Texture> &TextureManager::get_textures() { return this->textures; }
 
 std::string TextureManager::get_texture_path(const TextureKey &texture_key) const
@@ -78,6 +80,12 @@ nlohmann::json TextureManager::json_to() const
 void TextureManager::load() { this->file_from(this->storage_path + "/db.json"); }
 
 void TextureManager::save() const { this->file_to(this->storage_path + "/db.json"); }
+
+void TextureManager::set_storage_path(const std::string &new_path)
+{
+  this->storage_path = new_path;
+  this->update();
+}
 
 std::string TextureManager::try_download_texture(const TextureKey &texture_key,
                                                  bool              force_download) const
@@ -168,9 +176,9 @@ void TextureManager::update_from_poly_haven()
     ok = download_file(url, fname);
 
     // TODO TEST
-    k++;
-    if (k > 3)
-      break;
+    // k++;
+    // if (k > 8)
+    //   break;
   }
 }
 

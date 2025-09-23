@@ -37,6 +37,7 @@ signals:
   void textures_retrieved(const std::vector<std::string> &texture_paths);
 
 public slots:
+  void choose_storage_path();
   void purge_database();
   void retrieve_selected_textures();
   void unchecked_all_items();

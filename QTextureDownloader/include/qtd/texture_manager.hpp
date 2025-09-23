@@ -39,10 +39,12 @@ class TextureManager
 public:
   explicit TextureManager(const std::string &storage_path_ = "texture_downloader");
 
+  std::string                     get_storage_path() const;
   std::map<std::string, Texture> &get_textures();
   std::string                     get_texture_path(const TextureKey &texture_key) const;
   std::string                     get_thumbnail_path(const std::string &tex_id) const;
   bool                            is_empty() const;
+  void                            set_storage_path(const std::string &new_path);
 
   // does not override existing file (returns path to file)
   std::string try_download_texture(const TextureKey &texture_key,
