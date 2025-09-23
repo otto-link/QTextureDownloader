@@ -347,6 +347,21 @@ void TextureDownloader::update_table_rows()
 
   this->table_model->removeRows(0, this->table_model->rowCount());
 
+  // if the database is empty write an hint on how to update sources
+  if (this->texture_manager.is_empty())
+  {
+    this->table_model->appendRow(
+        {new QStandardItem(),
+         new QStandardItem(
+             "Use the menu bar 'Texture sources' to populate the texture database.")});
+    // TODO hardcoded
+    this->table_view->setSpan(0, 1, 1, 7);
+    return;
+  }
+
+  // else fill-in table
+  this->table_view->setSpan(0, 0, 1, 1);
+
   for (auto &[id, tex] : this->texture_manager.get_textures())
   {
     QList<QStandardItem *> items;

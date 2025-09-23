@@ -13,6 +13,13 @@ int main(int argc, char *argv[])
   qputenv("QT_LOGGING_RULES", QTD_QPUTENV_QT_LOGGING_RULES);
   QApplication app(argc, argv);
 
+  // style
+  const std::string style_sheet =
+#include "darkstyle.css"
+      ;
+  app.setStyleSheet(style_sheet.c_str());
+
+  // widget
   qtd::TextureDownloader *dw = new qtd::TextureDownloader("Test widget");
   dw->show();
 
