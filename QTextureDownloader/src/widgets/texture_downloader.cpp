@@ -115,7 +115,8 @@ void TextureDownloader::retrieve_selected_textures()
         TextureKey     key(item_id->text().toStdString(), type, this->res);
         std::string    path = this->texture_manager.try_download_texture(key);
 
-        texture_paths.push_back(path);
+        if (!path.empty())
+          texture_paths.push_back(path);
       }
     }
 

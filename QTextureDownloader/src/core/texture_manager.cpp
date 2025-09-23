@@ -95,7 +95,10 @@ std::string TextureManager::try_download_texture(const TextureKey &texture_key,
     std::string url = tex.get_texture_url(texture_key.type, texture_key.res);
 
     Logger::log()->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
-    download_file(url, fname);
+    bool ok = download_file(url, fname);
+
+    if (!ok)
+      return "";
   }
 
   return fname;
