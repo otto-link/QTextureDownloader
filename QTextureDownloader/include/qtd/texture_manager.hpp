@@ -40,12 +40,8 @@ public:
   explicit TextureManager(const std::string &storage_path_ = "texture_downloader");
 
   std::map<std::string, Texture> &get_textures();
-
-  std::string get_texture_path(const TextureKey &texture_key) const;
-
-  //   std::vector<uint16_t> get_texture_rgba_16bit(const std::string &id,
-  //                                                const TextureType &texture_type,
-  //                                                const TextureRes  &texture_res) const;
+  std::string                     get_texture_path(const TextureKey &texture_key) const;
+  bool                            is_empty() const;
 
   // does not override existing file (returns path to file)
   std::string try_download_texture(const TextureKey &texture_key,

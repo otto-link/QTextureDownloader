@@ -29,6 +29,8 @@ TextureManager::TextureManager(const std::string &storage_path_)
   }
 }
 
+bool TextureManager::is_empty() const { return this->textures.size() == 0; }
+
 void TextureManager::file_from(const std::string &fname)
 {
   nlohmann::json json = json_from_file(fname);
@@ -147,9 +149,9 @@ void TextureManager::update_from_poly_haven()
       this->textures[id] = new_texture;
 
     // TODO TEST
-    k++;
-    if (k > 6)
-      break;
+    // k++;
+    // if (k > 6)
+    //   break;
   }
 }
 

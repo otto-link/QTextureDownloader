@@ -37,6 +37,7 @@ signals:
   void textures_retrieved(const std::vector<std::string> &texture_paths);
 
 public slots:
+  void purge_database();
   void retrieve_selected_textures();
   void unchecked_all_items();
   void update_sources();
@@ -44,6 +45,7 @@ public slots:
 private:
   void setup_connections();
   void setup_layout();
+  void setup_menu_bar();
   void update_table_rows();
 
   // --- Members
@@ -52,7 +54,6 @@ private:
   TextureRes     res = TextureRes::R1K;
 
   QPushButton        *button_get_selected;
-  QPushButton        *button_update;
   QPushButton        *button_uncheck_items;
   QComboBox          *combo_res;
   QStandardItemModel *table_model;

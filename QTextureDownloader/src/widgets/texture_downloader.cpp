@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QHeaderView>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QProgressDialog>
 
@@ -26,13 +28,11 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   this->setup_layout();
+  this->setup_menu_bar();
   this->setup_connections();
 
   this->texture_manager.load();
   this->update_table_rows();
-
-  this->texture_manager.try_download_texture(
-      {"PolyHaven_aerial_asphalt_01", TextureType::NORMAL, TextureRes::R1K});
 }
 
 TextureDownloader::~TextureDownloader()
@@ -41,6 +41,41 @@ TextureDownloader::~TextureDownloader()
 
   this->texture_manager.save();
   QWidget::~QWidget();
+}
+
+void TextureDownloader::purge_database()
+{
+  Logger::log()->trace("TextureDownloader::purge_database");
+
+  auto reply = QMessageBox::question(
+      this,
+      tr("Purge Database"),
+      tr("This process will remove all local data, including textures image files.\nAre "
+         "you sure you want to continue?"),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
+
+  if (reply != QMessageBox::Yes)
+  {
+    Logger::log()->info("TextureDownloader::purge_database cancelled by user");
+    return;
+  }
+
+  // block UI
+  QProgressDialog progress(tr("Updating sources..."), QString(), 0, 0, this);
+  progress.setWindowModality(Qt::ApplicationModal);
+  progress.setCancelButton(nullptr);
+  progress.setMinimumDuration(0); // show immediately
+  progress.show();
+
+  // process events so dialog is painted before heavy work
+  QApplication::processEvents();
+
+  this->texture_manager = TextureManager();
+  this->texture_manager.save();
+  this->update_table_rows();
+
+  progress.close();
 }
 
 void TextureDownloader::retrieve_selected_textures()
@@ -105,11 +140,6 @@ void TextureDownloader::setup_connections()
                 this,
                 &TextureDownloader::retrieve_selected_textures);
 
-  this->connect(this->button_update,
-                &QPushButton::clicked,
-                this,
-                &TextureDownloader::update_sources);
-
   this->connect(this->button_uncheck_items,
                 &QPushButton::clicked,
                 this,
@@ -131,6 +161,15 @@ void TextureDownloader::setup_connections()
                   }
                   this->set_texture_res(new_res);
                 });
+
+  this->connect(this->table_model,
+                &QStandardItemModel::itemChanged,
+                this,
+                [this](QStandardItem *item)
+                {
+                  if (item->isCheckable())
+                    item->setText(item->checkState() == Qt::Checked ? "Y" : "N");
+                });
 }
 
 void TextureDownloader::setup_layout()
@@ -150,6 +189,10 @@ void TextureDownloader::setup_layout()
   this->button_get_selected = new QPushButton("Get selected");
   layout->addWidget(this->button_get_selected, 0, col++);
 
+  // clear checked items
+  this->button_uncheck_items = new QPushButton("Uncheck items");
+  layout->addWidget(this->button_uncheck_items, 0, col++);
+
   // combo
   this->combo_res = new QComboBox();
   layout->addWidget(this->combo_res, 0, col++);
@@ -165,17 +208,9 @@ void TextureDownloader::setup_layout()
   if (idx >= 0)
     this->combo_res->setCurrentIndex(idx);
 
-  // clear checked items
-  this->button_uncheck_items = new QPushButton("Uncheck items");
-  layout->addWidget(this->button_uncheck_items, 0, col++);
-
-  // update all
-  this->button_update = new QPushButton("Update sources");
-  layout->addWidget(this->button_update, 0, col++);
-
   // --- table
 
-  this->table_model = new QStandardItemModel(0, 3, this);
+  this->table_model = new QStandardItemModel(0, 0, this);
 
   // labels
   QStringList labels = {"Thumbnail", "Pinned", "ID", "Name", "Source"};
@@ -197,6 +232,36 @@ void TextureDownloader::setup_layout()
   this->table_view->setItemDelegateForColumn(0, new ThumbnailDelegate(this->table_view));
 
   layout->addWidget(this->table_view, 1, 0, 1, 4);
+}
+
+void TextureDownloader::setup_menu_bar()
+{
+  Logger::log()->trace("TextureDownloader::setup_menu_bar");
+
+  QMenuBar *menu_bar = new QMenuBar(this);
+  QMenu    *file_menu = menu_bar->addMenu("Texture sources");
+
+  // update
+  {
+    QAction *action = new QAction(tr("&Update sources"), this);
+    file_menu->addAction(action);
+
+    this->connect(action, &QAction::triggered, this, &TextureDownloader::update_sources);
+  }
+
+  file_menu->addSeparator();
+
+  // purge
+  {
+    QAction *action = new QAction(tr("&Purge database"), this);
+    file_menu->addAction(action);
+
+    this->connect(action, &QAction::triggered, this, &TextureDownloader::purge_database);
+  }
+
+  QLayout *layout = this->layout();
+  if (layout)
+    layout->setMenuBar(menu_bar);
 }
 
 QSize TextureDownloader::sizeHint() const { return QSize(QTD_CONFIG->widget.size_hint); }
@@ -224,7 +289,8 @@ void TextureDownloader::update_sources()
   auto reply = QMessageBox::question(
       this,
       tr("Update Sources"),
-      tr("This process may take a while.\nAre you sure you want to continue?"),
+      tr("Retrieving textures metadata, this process may take a while.\nAre you sure you "
+         "want to continue?"),
       QMessageBox::Yes | QMessageBox::No,
       QMessageBox::No);
 
@@ -271,6 +337,7 @@ void TextureDownloader::update_table_rows()
       QStandardItem *check_item = new QStandardItem;
       check_item->setCheckable(true);
       check_item->setCheckState(tex.get_is_pinned() ? Qt::Checked : Qt::Unchecked);
+      check_item->setText(tex.get_is_pinned() ? "Y" : "N");
       items.append(check_item);
     }
 
