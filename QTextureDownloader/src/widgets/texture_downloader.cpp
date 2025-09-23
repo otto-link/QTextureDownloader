@@ -71,6 +71,8 @@ void TextureDownloader::purge_database()
   // process events so dialog is painted before heavy work
   QApplication::processEvents();
 
+  // TODO remove files
+
   this->texture_manager = TextureManager();
   this->texture_manager.save();
   this->update_table_rows();
