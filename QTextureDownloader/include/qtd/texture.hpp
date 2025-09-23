@@ -73,10 +73,11 @@ public:
   std::vector<TextureRes> get_texture_resolutions(const TextureType &texture_type) const;
   std::string             get_texture_url(const TextureType &texture_type,
                                           const TextureRes  &texture_res) const;
-  const QImage           &get_thumbnail() const;
   bool                    has_texture(const TextureType &texture_type) const;
+  std::string             get_thumbnail_url() const;
   bool has_texture(const TextureType &texture_type, const TextureRes &texture_res) const;
   void set_id(const std::string &new_id);
+  void set_is_pinned(bool new_state);
 
   bool from_poly_haven(const std::string    &asset_id,
                        const nlohmann::json &json_asset_list);
@@ -91,8 +92,6 @@ private:
   std::string              thumbnail_url;
   std::vector<std::string> tags;
   bool                     is_pinned = false;
-
-  QImage thumbnail;
 
   std::map<std::string, std::string> diffuse_urls;
   std::map<std::string, std::string> normal_urls;

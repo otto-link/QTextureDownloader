@@ -165,14 +165,29 @@ void TextureDownloader::setup_connections()
                   this->set_texture_res(new_res);
                 });
 
-  this->connect(this->table_model,
-                &QStandardItemModel::itemChanged,
-                this,
-                [this](QStandardItem *item)
-                {
-                  if (item->isCheckable())
-                    item->setText(item->checkState() == Qt::Checked ? "Y" : "N");
-                });
+  this->connect(
+      this->table_model,
+      &QStandardItemModel::itemChanged,
+      this,
+      [this](QStandardItem *item)
+      {
+        if (item->isCheckable())
+        {
+          item->setText(item->checkState() == Qt::Checked ? "Y" : "N");
+
+          int col = item->index().column();
+
+          if (col == 1)
+          {
+            int row = item->index().row();
+
+            // TODO hardcoded
+            std::string tex_id = this->table_model->item(row, 2)->text().toStdString();
+            this->texture_manager.get_textures().at(tex_id).set_is_pinned(
+                item->checkState());
+          }
+        }
+      });
 }
 
 void TextureDownloader::setup_layout()
@@ -328,13 +343,24 @@ void TextureDownloader::update_table_rows()
 
   for (auto &[id, tex] : this->texture_manager.get_textures())
   {
+    QList<QStandardItem *> items;
 
     // thumbnail
-    QPixmap        pix = QPixmap::fromImage(tex.get_thumbnail());
-    QStandardItem *img_item = new QStandardItem;
-    img_item->setData(pix, Qt::DecorationRole);
+    QImage img = QImage(this->texture_manager.get_thumbnail_path(id).c_str());
 
-    QList<QStandardItem *> items = {img_item};
+    QStandardItem *img_item = new QStandardItem;
+
+    if (!img.isNull())
+    {
+      QPixmap pix = QPixmap::fromImage(img);
+      img_item->setData(pix, Qt::DecorationRole);
+    }
+    else
+    {
+      img_item->setText("No thumbnail");
+    }
+
+    items.append(img_item);
 
     {
       QStandardItem *check_item = new QStandardItem;

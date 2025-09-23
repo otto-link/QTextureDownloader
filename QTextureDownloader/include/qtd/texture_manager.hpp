@@ -41,6 +41,7 @@ public:
 
   std::map<std::string, Texture> &get_textures();
   std::string                     get_texture_path(const TextureKey &texture_key) const;
+  std::string                     get_thumbnail_path(const std::string &tex_id) const;
   bool                            is_empty() const;
 
   // does not override existing file (returns path to file)

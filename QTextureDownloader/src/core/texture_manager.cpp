@@ -49,6 +49,11 @@ std::string TextureManager::get_texture_path(const TextureKey &texture_key) cons
   return this->storage_path + "/" + texture_key.to_string() + ".png";
 }
 
+std::string TextureManager::get_thumbnail_path(const std::string &tex_id) const
+{
+  return this->storage_path + "/" + tex_id + "_thumbnail.png";
+}
+
 void TextureManager::json_from(nlohmann::json const &j)
 {
   this->textures.clear();
@@ -94,7 +99,7 @@ std::string TextureManager::try_download_texture(const TextureKey &texture_key,
   {
     std::string url = tex.get_texture_url(texture_key.type, texture_key.res);
 
-    Logger::log()->trace("TextureManager::get_texture_rgba_16bit: downloading {}", url);
+    Logger::log()->trace("TextureManager::try_download_texture: downloading {}", url);
     bool ok = download_file(url, fname);
 
     if (!ok)
@@ -150,11 +155,22 @@ void TextureManager::update_from_poly_haven()
 
     if (ok)
       this->textures[id] = new_texture;
+    else
+      continue;
+
+    // download thumbnail
+    std::string url = this->textures.at(id).get_thumbnail_url();
+    std::string fname = this->get_thumbnail_path(id);
+
+    Logger::log()->trace(
+        "TextureManager::update_from_poly_haven: downloading thumbnail {}",
+        url);
+    ok = download_file(url, fname);
 
     // TODO TEST
-    // k++;
-    // if (k > 6)
-    //   break;
+    k++;
+    if (k > 6)
+      break;
   }
 }
 

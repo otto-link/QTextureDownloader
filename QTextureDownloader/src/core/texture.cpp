@@ -49,19 +49,6 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
   ret |= json_safe_get(j, "thumbnail_url", this->thumbnail_url);
   ret |= json_safe_get(j, "tags", this->tags);
 
-  // thumbnail
-  {
-    ImageFetcher image_fetcher;
-    this->thumbnail = image_fetcher.fetch_sync(this->thumbnail_url);
-
-    if (this->thumbnail.isNull())
-    {
-      Logger::log()->error("Texture::from_poly_haven: thumbnail download error, asset {}",
-                           asset_id);
-      return false;
-    }
-  }
-
   // texture files
   {
     JsonFetcher    json_fetcher;
@@ -174,6 +161,8 @@ std::string Texture::get_texture_url(const TextureType &texture_type,
   return map.at(res_key);
 }
 
+std::string Texture::get_thumbnail_url() const { return this->thumbnail_url; }
+
 bool Texture::has_texture(const TextureType &texture_type) const
 {
   switch (texture_type)
@@ -204,8 +193,6 @@ bool Texture::has_texture(const TextureType &texture_type,
   return contains(available_res, texture_res);
 }
 
-const QImage &Texture::get_thumbnail() const { return this->thumbnail; }
-
 void Texture::json_from(nlohmann::json const &j)
 {
   json_safe_get(j, "id", id);
@@ -215,10 +202,6 @@ void Texture::json_from(nlohmann::json const &j)
   json_safe_get(j, "thumbnail_url", thumbnail_url);
   json_safe_get(j, "tags", tags);
   json_safe_get(j, "is_pinned", is_pinned);
-
-  if (j.contains("thumbnail") && j["thumbnail"].is_string())
-    thumbnail = qimage_from_base64(j["thumbnail"].get<std::string>());
-
   json_safe_get(j, "diffuse_urls", diffuse_urls);
   json_safe_get(j, "normal_urls", normal_urls);
   json_safe_get(j, "displacement_urls", displacement_urls);
@@ -235,7 +218,6 @@ nlohmann::json Texture::json_to() const
           {"thumbnail_url", thumbnail_url},
           {"tags", tags},
           {"is_pinned", is_pinned},
-          {"thumbnail", qimage_to_base64(thumbnail)},
           {"diffuse_urls", diffuse_urls},
           {"normal_urls", normal_urls},
           {"displacement_urls", displacement_urls}};
@@ -244,5 +226,7 @@ nlohmann::json Texture::json_to() const
 }
 
 void Texture::set_id(const std::string &new_id) { this->id = new_id; }
+
+void Texture::set_is_pinned(bool new_state) { this->is_pinned = new_state; }
 
 } // namespace qtd
