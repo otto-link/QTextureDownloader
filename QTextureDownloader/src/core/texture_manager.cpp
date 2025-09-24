@@ -1,6 +1,7 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
 #include <QApplication>
+#include <QSettings>
 
 #include <filesystem>
 
@@ -15,9 +16,25 @@ namespace qtd
 {
 
 TextureManager::TextureManager(const std::string &storage_path_)
-    : storage_path(storage_path_)
 {
   Logger::log()->trace("TextureManager::TextureManager");
+
+  // define storage path
+  if (storage_path_.empty())
+  {
+    // not explicitely provided => use the one from the saved
+    // settings or default one as a fallback
+    QSettings   settings("olink", "QTextureDownloader");
+    std::string path = settings.value("storage_path", "").toString().toStdString();
+    if (path.empty())
+      this->storage_path = "texture_downloader";
+    else
+      this->storage_path = path;
+  }
+  else
+  {
+    this->storage_path = storage_path_;
+  }
 
   // create storage
   std::filesystem::path dir = std::filesystem::path(this->storage_path);
@@ -79,7 +96,13 @@ nlohmann::json TextureManager::json_to() const
 
 void TextureManager::load() { this->file_from(this->storage_path + "/db.json"); }
 
-void TextureManager::save() const { this->file_to(this->storage_path + "/db.json"); }
+void TextureManager::save() const
+{
+  QSettings settings("olink", "QTextureDownloader");
+  settings.setValue("storage_path", this->storage_path.c_str());
+
+  this->file_to(this->storage_path + "/db.json");
+}
 
 void TextureManager::set_storage_path(const std::string &new_path)
 {

@@ -43,6 +43,9 @@ public slots:
   void unchecked_all_items();
   void update_sources();
 
+protected:
+  void closeEvent(QCloseEvent *event) override;
+
 private:
   void setup_connections();
   void setup_layout();

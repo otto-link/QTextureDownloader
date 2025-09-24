@@ -37,7 +37,7 @@ struct TextureKey
 class TextureManager
 {
 public:
-  explicit TextureManager(const std::string &storage_path_ = "texture_downloader");
+  explicit TextureManager(const std::string &storage_path_ = "");
 
   std::string                     get_storage_path() const;
   std::map<std::string, Texture> &get_textures();

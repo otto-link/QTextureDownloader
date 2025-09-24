@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -63,6 +64,12 @@ void TextureDownloader::choose_storage_path()
     Logger::log()->info("Storage path set to: {}",
                         this->texture_manager.get_storage_path());
   }
+}
+
+void TextureDownloader::closeEvent(QCloseEvent *event)
+{
+  this->texture_manager.save();
+  event->accept();
 }
 
 void TextureDownloader::purge_database()
