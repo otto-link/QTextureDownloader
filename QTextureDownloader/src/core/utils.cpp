@@ -78,28 +78,4 @@ void json_to_file(const nlohmann::json &json,
   }
 }
 
-std::string qimage_to_base64(const QImage &img)
-{
-  if (img.isNull())
-    return {};
-
-  QByteArray bytes;
-  QBuffer    buffer(&bytes);
-  buffer.open(QIODevice::WriteOnly);
-  img.save(&buffer, "PNG");
-
-  return bytes.toBase64().toStdString();
-}
-
-QImage qimage_from_base64(const std::string &b64)
-{
-  if (b64.empty())
-    return {};
-
-  QByteArray data = QByteArray::fromBase64(QByteArray::fromStdString(b64));
-  QImage     img;
-  img.loadFromData(data, "PNG");
-  return img;
-}
-
 } // namespace qtd

@@ -2,6 +2,7 @@
    License. The full license is in the file LICENSE, distributed with this software. */
 #include <QEventLoop>
 #include <QFile>
+#include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -13,10 +14,10 @@
 namespace qtd
 {
 
-bool download_file(const std::string &url, const std::string &file_path)
+bool download_file(const std::string &url, const std::string &file_path, bool overwrite)
 {
   QNetworkAccessManager manager;
-  QNetworkRequest       request(QUrl(url.c_str()));
+  QNetworkRequest       request(QUrl(QString::fromStdString(url)));
   QNetworkReply        *reply = manager.get(request);
 
   QEventLoop loop;
@@ -25,12 +26,20 @@ bool download_file(const std::string &url, const std::string &file_path)
 
   if (reply->error() != QNetworkReply::NoError)
   {
-    Logger::log()->error("download_file: download error");
+    Logger::log()->error("download_file: download error: {}", url);
     reply->deleteLater();
     return false;
   }
 
-  QFile file(file_path.c_str());
+  QFileInfo file_info(QString::fromStdString(file_path));
+  if (file_info.exists() && !overwrite)
+  {
+    Logger::log()->trace("download_file: file already exists, skipping: {}", file_path);
+    reply->deleteLater();
+    return false;
+  }
+
+  QFile file(QString::fromStdString(file_path));
   if (!file.open(QIODevice::WriteOnly))
   {
     Logger::log()->error("download_file: error writing file: {}", file_path);

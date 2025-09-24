@@ -20,9 +20,8 @@ void           json_to_file(const nlohmann::json &json,
                             const std::string    &fname,
                             bool                  merge_with_existing_content = false);
 
-std::string qimage_to_base64(const QImage &img);
-QImage      qimage_from_base64(const std::string &b64);
-
-bool download_file(const std::string &url, const std::string &file_path);
+bool download_file(const std::string &url,
+                   const std::string &file_path,
+                   bool               overwrite = false);
 
 } // namespace qtd
