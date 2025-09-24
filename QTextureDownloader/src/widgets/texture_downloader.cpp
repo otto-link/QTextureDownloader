@@ -70,6 +70,7 @@ void TextureDownloader::closeEvent(QCloseEvent *event)
 {
   this->texture_manager.save();
   event->accept();
+  Q_EMIT this->window_closed();
 }
 
 void TextureDownloader::purge_database()

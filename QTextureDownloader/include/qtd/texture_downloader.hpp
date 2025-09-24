@@ -24,10 +24,6 @@ public:
   explicit TextureDownloader(const std::string &_title = "", QWidget *parent = nullptr);
   ~TextureDownloader();
 
-  // --- Serialization
-  //   void           json_from(nlohmann::json const &json);
-  //   nlohmann::json json_to() const;
-
   void set_texture_res(const TextureRes &new_res);
 
   // --- QWidget interface
@@ -35,6 +31,7 @@ public:
 
 signals:
   void textures_retrieved(const std::vector<std::string> &texture_paths);
+  void window_closed();
 
 public slots:
   void choose_storage_path();
