@@ -53,6 +53,7 @@ private:
   std::string    title;
   TextureManager texture_manager;
   TextureRes     res = TextureRes::R1K;
+  bool           first_table_view_creation = true;
 
   QPushButton        *button_get_selected;
   QPushButton        *button_uncheck_items;

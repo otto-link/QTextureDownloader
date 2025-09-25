@@ -447,6 +447,12 @@ void TextureDownloader::update_table_rows()
 
     this->table_model->appendRow(items);
   }
+
+  if (this->first_table_view_creation)
+  {
+    this->table_view->sortByColumn(1, Qt::DescendingOrder);
+    this->first_table_view_creation = false;
+  }
 }
 
 } // namespace qtd
