@@ -150,6 +150,9 @@ void TextureDownloader::retrieve_selected_textures()
       }
     }
 
+  // free selection
+  this->unchecked_all_items();
+
   Q_EMIT this->textures_retrieved(texture_paths);
 }
 
@@ -162,6 +165,7 @@ void TextureDownloader::set_texture_res(const TextureRes &new_res)
 
   this->res = new_res;
   this->update_table_rows();
+  this->table_view->sortByColumn(1, Qt::DescendingOrder);
 }
 
 void TextureDownloader::setup_connections()
