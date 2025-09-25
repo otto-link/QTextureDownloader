@@ -183,7 +183,7 @@ void TextureDownloader::setup_connections()
                 [this]()
                 {
                   std::string res_name = this->combo_res->currentText().toStdString();
-                  TextureRes  new_res;
+                  TextureRes  new_res = TextureRes::RUNKNOWN;
                   for (auto &[r, str] : texture_res_as_string)
                   {
                     if (str == res_name)
