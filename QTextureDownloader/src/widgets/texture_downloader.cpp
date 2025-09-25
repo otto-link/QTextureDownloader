@@ -116,6 +116,16 @@ void TextureDownloader::retrieve_selected_textures()
 
   std::vector<std::string> texture_paths;
 
+  // block UI
+  QProgressDialog progress(tr("Retrieving textures..."), QString(), 0, 0, this);
+  progress.setWindowModality(Qt::ApplicationModal);
+  progress.setCancelButton(nullptr);
+  progress.setMinimumDuration(0); // show immediately
+  progress.show();
+
+  // process events so dialog is painted before heavy work
+  QApplication::processEvents();
+
   // list checked items
 
   for (int row = 0; row < this->table_model->rowCount(); ++row)
@@ -152,6 +162,9 @@ void TextureDownloader::retrieve_selected_textures()
 
   // free selection
   this->unchecked_all_items();
+
+  // unblock UI
+  progress.close();
 
   Q_EMIT this->textures_retrieved(texture_paths);
 }
