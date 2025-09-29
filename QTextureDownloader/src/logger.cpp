@@ -13,7 +13,7 @@ std::shared_ptr<spdlog::logger> &Logger::log()
   if (!instance)
   {
     instance = spdlog::stdout_color_mt("console_qtd");
-    instance->set_pattern("[qtdwlo] [%H:%M:%S] [%^---%L---%$] %v");
+    instance->set_pattern("[qtexdw] [%H:%M:%S] [%^---%L---%$] %v");
     instance->set_level(spdlog::level::trace);
   }
   return instance;

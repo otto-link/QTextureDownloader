@@ -1,10 +1,12 @@
 /* Copyright (c) 2025 Otto Link. Distributed under the terms of the GNU General Public
    License. The full license is in the file LICENSE, distributed with this software. */
-#include "qtd/texture.hpp"
+#include <regex>
+
 #include "qtd/config.hpp"
 #include "qtd/image_fetcher.hpp"
 #include "qtd/json_fetcher.hpp"
 #include "qtd/logger.hpp"
+#include "qtd/texture.hpp"
 #include "qtd/utils.hpp"
 
 namespace qtd
@@ -48,6 +50,17 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
   ret |= json_safe_get(j, "name", this->name);
   ret |= json_safe_get(j, "thumbnail_url", this->thumbnail_url);
   ret |= json_safe_get(j, "tags", this->tags);
+
+  // adjust thumbnail resolution (replace width and height)
+  int w = QTD_CONFIG->widget.thumbnail_size.width();
+  int h = QTD_CONFIG->widget.thumbnail_size.height();
+
+  thumbnail_url = std::regex_replace(thumbnail_url,
+                                     std::regex("width=\\d+"),
+                                     "width=" + w);
+  thumbnail_url = std::regex_replace(thumbnail_url,
+                                     std::regex("height=\\d+"),
+                                     "height=" + h);
 
   // texture files
   {
