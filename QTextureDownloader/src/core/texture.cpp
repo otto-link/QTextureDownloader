@@ -57,10 +57,10 @@ bool Texture::from_poly_haven(const std::string    &asset_id,
 
   thumbnail_url = std::regex_replace(thumbnail_url,
                                      std::regex("width=\\d+"),
-                                     "width=" + w);
+                                     "width=" + std::to_string(w));
   thumbnail_url = std::regex_replace(thumbnail_url,
                                      std::regex("height=\\d+"),
-                                     "height=" + h);
+                                     "height=" + std::to_string(h));
 
   // texture files
   {

@@ -19,7 +19,7 @@ public:
   struct Widget
   {
     QSize size_hint = QSize(1024, 768);
-    QSize thumbnail_size = QSize(128, 128);
+    QSize thumbnail_size = QSize(64, 64);
   } widget;
 
 private:
