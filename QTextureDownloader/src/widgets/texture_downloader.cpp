@@ -43,9 +43,7 @@ TextureDownloader::TextureDownloader(const std::string &_title, QWidget *parent)
 TextureDownloader::~TextureDownloader()
 {
   Logger::log()->trace("TextureDownloader::~TextureDownloader");
-
   this->texture_manager.save();
-  QWidget::~QWidget();
 }
 
 void TextureDownloader::choose_storage_path()
